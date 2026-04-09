@@ -27,10 +27,18 @@ export class ListesDesAlarmes implements OnInit {
   searchQuery = '';
   selectedMachineId: number | null = null;
   filterStatus: 'all' | 'active' | 'inactive' = 'all';
-
+currentPage = 1;
+  itemsPerPage = 10;
   AlarmStatus = AlarmStatus;
   AlarmPriority = AlarmPriority;
+get totalPages(): number {
+    return Math.ceil(this.filteredAlarms.length / this.itemsPerPage) || 1;
+  }
 
+  get paginatedAlarms(): Alarm[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.filteredAlarms.slice(startIndex, startIndex + this.itemsPerPage);
+  }
   constructor(
     private alarmService: AlarmService,
     private machineService: MachineService,
@@ -65,7 +73,7 @@ export class ListesDesAlarmes implements OnInit {
       else if (st === 'inactive') obs$ = this.alarmService.findInactiveByMachine(mId);
       else obs$ = this.alarmService.findByMachine(mId);
     }
-
+    
     obs$.subscribe({
       next: (data) => {
         // Envelopper dans un setTimeout force Angular à exécuter un cycle de détection des changements (macro-task)
@@ -73,8 +81,18 @@ export class ListesDesAlarmes implements OnInit {
           this.alarms = [...data].sort((a, b) => {
             const dateA = a.triggeredAt ? new Date(a.triggeredAt).getTime() : 0;
             const dateB = b.triggeredAt ? new Date(b.triggeredAt).getTime() : 0;
-            return dateB - dateA;
+            
+            // 1. Tri principal : par date décroissante
+            if (dateB !== dateA) {
+              return dateB - dateA;
+            }
+            
+            // 2. 🛑 CORRECTIF : Tri secondaire par ID. 
+            // Si les dates sont identiques, on trie par ID décroissant. 
+            // Cela empêche les alarmes de sauter et de changer de place après l'acquittement.
+            return b.id - a.id; 
           });
+          
           this.applyFilter();
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -92,6 +110,19 @@ export class ListesDesAlarmes implements OnInit {
         });
       }
     });
+  }
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.cdr.markForCheck();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.cdr.markForCheck();
+    }
   }
 
   loadMachines() {
@@ -138,7 +169,7 @@ export class ListesDesAlarmes implements OnInit {
 
     return matchesSearch && matchesMachine && matchesStatus;
   });
-
+this.currentPage = 1;
   this.cdr.markForCheck();
 }
 
@@ -149,7 +180,10 @@ export class ListesDesAlarmes implements OnInit {
 
   onAlarmAdded(payload: { machineId: number; alarm: Partial<Alarm> }) {
     this.alarmService.create(payload.machineId, payload.alarm).subscribe({
-      next: () => { this.loadAlarms(); this.closePops(); },
+      next: () => { 
+        this.closePops(); 
+        window.location.reload(); // 🔄 Force le rafraîchissement de la page
+      },
       error: () => {
         this.alarms.unshift({ ...payload.alarm, id: Date.now() } as Alarm);
         this.applyFilter();
@@ -160,7 +194,10 @@ export class ListesDesAlarmes implements OnInit {
 
   onAlarmUpdated(updated: Alarm) {
     this.alarmService.update(updated.id, updated).subscribe({
-      next: () => { this.loadAlarms(); this.closePops(); },
+      next: () => { 
+        this.closePops(); 
+        window.location.reload(); // 🔄 Force le rafraîchissement de la page
+      },
       error: () => {
         const idx = this.alarms.findIndex(a => a.id === updated.id);
         if (idx > -1) this.alarms[idx] = updated;
@@ -169,12 +206,37 @@ export class ListesDesAlarmes implements OnInit {
       }
     });
   }
+  acknowledgeAlarm(alarm: Alarm) {
+    if (!confirm('Voulez-vous vraiment acquitter (désactiver) cette alarme ?')) return;
 
+    // Créer une copie de l'alarme avec le statut modifié
+    const updatedAlarm = { ...alarm, isActive: false, status: AlarmStatus.VIEWED };
+
+    this.alarmService.update(alarm.id, updatedAlarm).subscribe({
+      next: () => {
+        window.location.reload(); // 🔄 Force le rafraîchissement
+      },
+      error: (err) => {
+        console.error("Erreur lors de l'acquittement", err);
+        // Mise à jour locale (optimiste) en cas d'erreur ou d'absence de backend réel
+        const idx = this.alarms.findIndex(a => a.id === alarm.id);
+        if (idx > -1) {
+          this.alarms[idx] = updatedAlarm;
+          this.applyFilter();
+        }
+      }
+    });
+  }
   deleteAlarm(id: number) {
     if (!confirm('Supprimer cette alarme ?')) return;
     this.alarmService.remove(id).subscribe({
-      next: () => this.loadAlarms(),
-      error: () => { this.alarms = this.alarms.filter(a => a.id !== id); this.applyFilter(); }
+      next: () => { 
+        window.location.reload(); // 🔄 Force le rafraîchissement de la page
+      },
+      error: () => { 
+        this.alarms = this.alarms.filter(a => a.id !== id); 
+        this.applyFilter(); 
+      }
     });
   }
 

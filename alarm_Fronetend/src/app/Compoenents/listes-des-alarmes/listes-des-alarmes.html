@@ -138,24 +138,29 @@
         <tbody>
           <tr
   class="table-row"
-  *ngFor="let alarm of filteredAlarms"
+  *ngFor="let alarm of paginatedAlarms"
   [class.row-active]="alarm.isActive"
 >
 
             <!-- Priority -->
             <td>
-              <div class="priority-cell">
-                <span class="priority-dot"
-                  [class.dot-critical]="alarm.priority === AlarmPriority.CRITICAL"
-                  [class.dot-medium]="alarm.priority === AlarmPriority.MEDIUM"
-                  [class.dot-low]="alarm.priority === AlarmPriority.LOW">
-                </span>
-                <span class="priority-badge"
-                  [class.badge-critical]="alarm.priority === AlarmPriority.CRITICAL"
-                  [class.badge-medium]="alarm.priority === AlarmPriority.MEDIUM"
-                  [class.badge-low]="alarm.priority === AlarmPriority.LOW">
-                  {{ alarm.priority }}
-                </span>
+              <div class="actions-cell">
+                
+                <button 
+                  *ngIf="alarm.isActive" 
+                  class="btn-ack" 
+                  (click)="acknowledgeAlarm(alarm)" 
+                  title="Acquitter l'alarme">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  ACK
+                </button>
+
+                <button class="icon-btn btn-edit" (click)="openEdit(alarm)" title="Modifier">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="icon-btn btn-delete" (click)="deleteAlarm(alarm.id)" title="Supprimer">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </button>
               </div>
             </td>
 
@@ -221,7 +226,19 @@
           </tr>
         </tbody>
       </table>
-
+<div class="pagination-container" *ngIf="filteredAlarms.length > itemsPerPage">
+        <button class="btn-page" (click)="prevPage()" [disabled]="currentPage === 1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Précédent
+        </button>
+        
+        <span class="page-info">Page <b>{{ currentPage }}</b> sur {{ totalPages }}</span>
+        
+        <button class="btn-page" (click)="nextPage()" [disabled]="currentPage === totalPages">
+          Suivant
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
       <ng-template #emptyTpl>
         <div class="empty-state">
           <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>

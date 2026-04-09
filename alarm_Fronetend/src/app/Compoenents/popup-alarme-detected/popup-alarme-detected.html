@@ -1,42 +1,71 @@
 <div class="toast-container">
-  <div *ngFor="let alarm of visibleAlarms" 
-       class="toast-card" 
-       [@toastAnimation]
-       [ngStyle]="{'border-left-color': getPriorityColor(alarm.priority)}">
-    
+  <div
+    *ngFor="let alarm of visibleAlarms"
+    class="toast-card"
+    [@toastAnimation]
+    [style.border-left-color]="getPriorityColor(alarm.priority)"
+  >
+    <!-- Barre auto-dismiss -->
+    <div class="toast-progress">
+      <div class="toast-progress-fill"></div>
+    </div>
+
+    <!-- Header -->
     <div class="toast-header">
-      <div class="toast-icon" [ngStyle]="{'color': getPriorityColor(alarm.priority)}">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/>
-          <line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-      </div>
-      <div class="toast-title">
-        Nouvelle Alarme Détectée
-      </div>
-      <button class="toast-close" (click)="dismiss(alarm)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/>
-          <line x1="6" y1="6" x2="18" y2="18"/>
+      <span class="toast-status-dot"></span>
+      <span class="toast-title">Alarme système</span>
+      <span class="toast-id">{{ alarm.code || 'ALM-????' }}</span>
+      <button class="toast-close" (click)="dismiss(alarm)" title="Fermer">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"
+             stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round">
+          <line x1="1" y1="1" x2="11" y2="11"/>
+          <line x1="11" y1="1" x2="1" y2="11"/>
         </svg>
       </button>
     </div>
 
+    <!-- Body -->
     <div class="toast-body">
-      <div class="alarm-detail">
-        <span class="label">Code:</span> <span class="value">{{alarm.code}}</span>
+
+      <!-- Machine -->
+      <div class="toast-machine-name">
+        {{ alarm.machine?.name || 'Machine inconnue' }}
       </div>
-      <div class="alarm-detail">
-        <span class="label">Message:</span> <span class="value">{{alarm.message}}</span>
+
+      <!-- Message -->
+      <div class="toast-message">{{ alarm.message }}</div>
+
+      <!-- Métriques compactes -->
+      <div class="toast-metrics">
+        <div class="toast-metric">
+          <span class="metric-label">Priorité</span>
+          <span class="metric-value"
+                [style.color]="getPriorityColor(alarm.priority)">
+            {{ alarm.priority }}
+          </span>
+        </div>
+        <div class="toast-metric">
+          <span class="metric-label">Code</span>
+          <span class="metric-value">{{ alarm.code || '—' }}</span>
+        </div>
+        <div class="toast-metric">
+          <span class="metric-label">Heure</span>
+          <span class="metric-value">{{ alarm.createdAt | date:'HH:mm:ss' }}</span>
+        </div>
       </div>
-      <div class="alarm-detail">
-        <span class="label">Priorité:</span> 
-        <span class="value badge-priority" [ngStyle]="{'background-color': getPriorityColor(alarm.priority) + '20', 'color': getPriorityColor(alarm.priority)}">
-          {{alarm.priority}}
-        </span>
-      </div>
+
     </div>
-    
+
+    <!-- Footer -->
+    <div class="toast-footer">
+      <span class="toast-timestamp">
+        {{ alarm.createdAt | date:'dd/MM/yyyy HH:mm:ss' }}
+      </span>
+      <button class="toast-ack-btn" (click)="dismiss(alarm)">
+        Acquitter
+      </button>
+    </div>
+
   </div>
 </div>
