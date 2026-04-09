@@ -1,0 +1,100 @@
+/* Alarm popup — same base as machine popup + alarm-specific styles */
+
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(15,23,42,0.35);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 1rem;
+  animation: overlayIn 0.25s ease;
+}
+@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-panel {
+  width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--status-alarm);
+  border-radius: 12px;
+  box-shadow: var(--shadow-popup);
+  animation: panelIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 1.5rem; border-bottom: 1px solid var(--border);
+  background: var(--bg-elevated); border-radius: 9px 9px 0 0;
+}
+
+.modal-title-group { display: flex; align-items: center; gap: 0.9rem; }
+
+.modal-icon {
+  width: 42px; height: 42px; border-radius: 10px;
+  background: var(--status-alarm-bg); border: 1px solid var(--status-alarm-border);
+  color: var(--status-alarm); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.modal-icon-alarm { background: var(--status-alarm-bg); border-color: var(--status-alarm-border); color: var(--status-alarm); }
+.modal-icon-edit  { background: var(--status-warn-bg);  border-color: var(--status-warn-border);  color: var(--status-warn); }
+
+.modal-title   { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.15rem; }
+.modal-subtitle { font-size: 0.78rem; color: var(--text-muted); font-family: var(--text-mono); }
+
+.close-btn {
+  width: 34px; height: 34px; border-radius: 6px;
+  border: 1px solid var(--border); background: #fff;
+  color: var(--text-muted); display: flex; align-items: center;
+  justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+}
+.close-btn:hover { background: var(--status-alarm-bg); color: var(--status-alarm); border-color: var(--status-alarm-border); }
+
+.modal-body { padding: 1.5rem; background: #fff; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.25rem; }
+
+.form-control.mono { font-family: var(--text-mono); font-size: 0.85rem; }
+
+textarea.form-control { resize: vertical; min-height: 80px; }
+
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 1rem; background: var(--bg-elevated);
+  border: 1px solid var(--border); border-radius: 8px; margin-top: 0.5rem;
+}
+.toggle-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+
+.toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: #CBD5E1; border-radius: 34px; transition: all 0.3s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute; width: 18px; height: 18px;
+  left: 3px; top: 3px; background: white; border-radius: 50%;
+  transition: all 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--status-ok); box-shadow: 0 0 10px rgba(5,150,105,0.25); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+.modal-footer {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  padding: 1.25rem 1.5rem; border-top: 1px solid var(--border);
+  background: var(--bg-elevated); border-radius: 0 0 12px 12px;
+}
+
+/* Alarm-specific save button */
+.btn-alarm-save {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.6rem 1.2rem; border-radius: 6px;
+  font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer;
+  background: var(--status-alarm); color: #fff;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.25); transition: all var(--t);
+}
+.btn-alarm-save:hover { background: #b91c1c; transform: translateY(-1px); }
+
+@media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } }

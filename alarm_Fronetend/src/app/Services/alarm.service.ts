@@ -23,9 +23,29 @@ export class AlarmService {
     return this.http.get<Alarm[]>(this.apiUrl);
   }
 
+  // ✅ GET ALL ACTIVE
+  findActive(): Observable<Alarm[]> {
+    return this.http.get<Alarm[]>(`${this.apiUrl}/active`);
+  }
+
+  // ✅ GET ALL INACTIVE
+  findInactive(): Observable<Alarm[]> {
+    return this.http.get<Alarm[]>(`${this.apiUrl}/inactive`);
+  }
+
   // ✅ GET BY MACHINE
   findByMachine(machineId: number): Observable<Alarm[]> {
     return this.http.get<Alarm[]>(`${this.apiUrl}/machine/${machineId}`);
+  }
+
+  // ✅ GET ACTIVE BY MACHINE
+  findActiveByMachine(machineId: number): Observable<Alarm[]> {
+    return this.http.get<Alarm[]>(`${this.apiUrl}/machine/${machineId}/active`);
+  }
+
+  // ✅ GET INACTIVE BY MACHINE
+  findInactiveByMachine(machineId: number): Observable<Alarm[]> {
+    return this.http.get<Alarm[]>(`${this.apiUrl}/machine/${machineId}/inactive`);
   }
 
   // ✅ GET BY ID

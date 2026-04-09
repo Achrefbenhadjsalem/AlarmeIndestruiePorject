@@ -43,6 +43,38 @@ export class AlarmService {
       .where('machine.id = :machineId', { machineId })
       .getMany();
   }
+  findActive() {
+    return this.alarmRepo.find({ 
+      where: { isActive: true }, 
+      relations: ['machine'] 
+    });
+  }
+  findActiveByMachine(machineId: number) {
+    return this.alarmRepo.find({
+      where: { 
+        isActive: true,
+        machine: { id: machineId } 
+      },
+      relations: ['machine'],
+    });
+  }
+
+  findInactiveByMachine(machineId: number) {
+    return this.alarmRepo.find({
+      where: { 
+        isActive: false,
+        machine: { id: machineId } 
+      },
+      relations: ['machine'],
+    });
+  }
+
+  findInactive() {
+    return this.alarmRepo.find({ 
+      where: { isActive: false }, 
+      relations: ['machine'] 
+    });
+  }
 
   async findOne(id: number) {
     const a = await this.alarmRepo.findOne({ where: { id }, relations: ['machine'] });

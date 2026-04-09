@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, inject, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MachineService } from '../../Services/machine.service';
 import { Machine } from '../../Models/Machine';
@@ -20,33 +20,40 @@ export class ListesDesMachines implements OnInit {
   selectedMachine: Machine | null = null;
   isLoading = true;
   searchQuery = '';
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
 
-  constructor(private machineService: MachineService) {}
+ constructor(private machineService: MachineService) {
+  // remove afterNextRender block entirely
+}
 
-  ngOnInit(): void { this.loadMachines(); }
+  ngOnInit(): void { 
+    this.loadMachines();
+     
+  }
 
   get activeCount()  { return this.machines.filter(m => m.isActive).length; }
   get stoppedCount() { return this.machines.filter(m => !m.isActive).length; }
 
   loadMachines() {
     this.isLoading = true;
+    
     this.machineService.findAll().subscribe({
       next: (data) => {
-        this.machines = data;
-        this.applyFilter();
-        this.isLoading = false;
+        this.ngZone.run(() => {
+          this.machines = [...data];
+          this.applyFilter();
+          this.isLoading = false;
+          
+          this.cdr.detectChanges();
+        });
       },
-      error: () => {
-        // Fallback mock data for frontend dev
-        this.machines = [
-          { id: 1, name: 'Extrudeuse Alpha', code: 'EXT-01', isActive: true,  type: 'Moulage',   location: 'Atelier Nord', protocol: 'Modbus TCP', ipAddress: '192.168.1.10', createdAt: new Date('2024-01-15'), updatedAt: new Date() } as Machine,
-          { id: 2, name: 'Presse Hydraulique', code: 'PRS-02', isActive: false, type: 'Pression', location: 'Atelier Sud',  protocol: 'OPC UA',    ipAddress: '192.168.1.11', createdAt: new Date('2024-02-20'), updatedAt: new Date() } as Machine,
-          { id: 3, name: 'Convoyeur C3', code: 'CNV-03', isActive: true,  type: 'Transport', location: 'Zone B',      protocol: 'S7',        ipAddress: '192.168.1.12', createdAt: new Date('2024-03-10'), updatedAt: new Date() } as Machine,
-          { id: 4, name: 'Fours Industriels', code: 'FRN-04', isActive: true,  type: 'Chaleur',   location: 'Zone C',      protocol: 'Modbus TCP', ipAddress: '192.168.1.13', createdAt: new Date('2024-03-18'), updatedAt: new Date() } as Machine,
-          { id: 5, name: 'Compresseur D5',    code: 'CMP-05', isActive: false, type: 'Pneumatique',location: 'Atelier Est', protocol: 'OPC UA',    ipAddress: '192.168.1.14', createdAt: new Date('2024-04-01'), updatedAt: new Date() } as Machine,
-        ];
-        this.applyFilter();
-        this.isLoading = false;
+      error: (err) => {
+        this.ngZone.run(() => {
+          console.error('Energie OS - Machine Load Error:', err);
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
       }
     });
   }

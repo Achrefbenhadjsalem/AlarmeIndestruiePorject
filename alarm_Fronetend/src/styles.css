@@ -1,53 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ============================================================
-   INDUSTRIAL MONITORING PLATFORM - Global Design System
+   INDUSTRIAL MONITORING PLATFORM — Light Theme
    ============================================================ */
 :root {
   /* Core background layers */
-  --bg-base:        #080C14;
-  --bg-surface:     #0D1423;
-  --bg-elevated:    #111C30;
-  --bg-hover:       #16223A;
-  --bg-active:      #1A2B48;
+  --bg-base:        #F0F4FA;
+  --bg-surface:     #FFFFFF;
+  --bg-elevated:    #F8FAFF;
+  --bg-hover:       #EDF2FB;
+  --bg-active:      #E1EBFC;
 
   /* Brand / Accent */
   --accent:         #1E6FF1;
-  --accent-glow:    rgba(30, 111, 241, 0.25);
-  --accent-hover:   #2B7FFF;
-  --accent-subtle:  rgba(30, 111, 241, 0.10);
-  --accent-border:  rgba(30, 111, 241, 0.35);
+  --accent-glow:    rgba(30, 111, 241, 0.18);
+  --accent-hover:   #1558CC;
+  --accent-subtle:  rgba(30, 111, 241, 0.08);
+  --accent-border:  rgba(30, 111, 241, 0.25);
 
   /* Status Colors */
-  --status-ok:      #00D68F;
-  --status-ok-bg:   rgba(0, 214, 143, 0.08);
-  --status-ok-border: rgba(0, 214, 143, 0.25);
+  --status-ok:      #059669;
+  --status-ok-bg:   rgba(5, 150, 105, 0.08);
+  --status-ok-border: rgba(5, 150, 105, 0.25);
 
-  --status-warn:    #FFB547;
-  --status-warn-bg: rgba(255, 181, 71, 0.08);
-  --status-warn-border: rgba(255, 181, 71, 0.25);
+  --status-warn:    #D97706;
+  --status-warn-bg: rgba(217, 119, 6, 0.08);
+  --status-warn-border: rgba(217, 119, 6, 0.25);
 
-  --status-alarm:   #FF4757;
-  --status-alarm-bg: rgba(255, 71, 87, 0.08);
-  --status-alarm-border: rgba(255, 71, 87, 0.25);
+  --status-alarm:   #DC2626;
+  --status-alarm-bg: rgba(220, 38, 38, 0.07);
+  --status-alarm-border: rgba(220, 38, 38, 0.2);
 
-  --status-off:     #64748B;
-  --status-off-bg:  rgba(100, 116, 139, 0.08);
+  --status-off:     #94A3B8;
+  --status-off-bg:  rgba(148, 163, 184, 0.1);
 
   /* Typography */
-  --text-primary:   #F0F4FF;
-  --text-secondary: #8899b4;
-  --text-muted:     #4A5C7A;
+  --text-primary:   #0F172A;
+  --text-secondary: #475569;
+  --text-muted:     #94A3B8;
   --text-mono:      'JetBrains Mono', monospace;
 
   /* Borders */
-  --border:         rgba(255, 255, 255, 0.06);
-  --border-light:   rgba(255, 255, 255, 0.10);
+  --border:         #E2E8F0;
+  --border-light:   #CBD5E1;
   --border-accent:  rgba(30, 111, 241, 0.3);
 
   /* Shadows */
-  --shadow-card:    0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-popup:   0 16px 64px rgba(0, 0, 0, 0.6);
+  --shadow-card:    0 1px 4px rgba(15,23,42,0.07), 0 4px 16px rgba(15,23,42,0.05);
+  --shadow-popup:   0 16px 64px rgba(15,23,42,0.18), 0 2px 8px rgba(15,23,42,0.08);
 
   /* Transitions */
   --t: 0.2s ease;
@@ -69,16 +69,15 @@ html, body {
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: var(--bg-active); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* ── Glass Panel ── */
+/* ── White Panel (equivalent of glass) ── */
 .glass {
-  background: linear-gradient(135deg, rgba(13,20,35,0.95), rgba(17,28,48,0.90));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 10px;
+  box-shadow: var(--shadow-card);
 }
 
 /* ── Form Controls ── */
@@ -95,8 +94,8 @@ html, body {
 
 .form-control {
   width: 100%;
-  background: var(--bg-base);
-  border: 1px solid var(--border-light);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
   color: var(--text-primary);
   padding: 0.65rem 0.9rem;
   border-radius: 6px;
@@ -108,15 +107,16 @@ html, body {
 .form-control:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-glow);
+  background: #fff;
 }
 .form-control::placeholder { color: var(--text-muted); }
 select.form-control {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238899b4' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
 }
-select.form-control option { background: var(--bg-elevated); }
+select.form-control option { background: var(--bg-surface); color: var(--text-primary); }
 
 /* ── Buttons ── */
 .btn {
@@ -131,13 +131,13 @@ select.form-control option { background: var(--bg-elevated); }
 .btn-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 0 20px var(--accent-glow);
+  box-shadow: 0 2px 8px rgba(30, 111, 241, 0.25);
 }
-.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(30,111,241,0.3); }
 .btn-ghost {
   background: transparent;
   color: var(--text-secondary);
-  border: 1px solid var(--border-light);
+  border: 1px solid var(--border);
 }
 .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
 .btn-danger {
@@ -145,6 +145,6 @@ select.form-control option { background: var(--bg-elevated); }
   color: var(--status-alarm);
   border: 1px solid var(--status-alarm-border);
 }
-.btn-danger:hover { background: rgba(255,71,87,0.16); }
+.btn-danger:hover { background: rgba(220,38,38,0.14); }
 
 .req { color: var(--status-alarm); }

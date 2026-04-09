@@ -1,1 +1,255 @@
-<p>listes-des-alarmes works!</p>
+<div class="page-shell">
+
+  <!-- ═══════════ TOPBAR ═══════════ -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <img src="logo-white.svg" alt="Logo" class="brand-logo" />
+      <div class="brand-sep"></div>
+      <div class="brand-text">
+        <span class="brand-title">SUPERVISION INDUSTRIELLE</span>
+        <span class="brand-sub">Monitoring &amp; Alertes en Temps Réel</span>
+      </div>
+    </div>
+    <div class="topbar-center">
+      <div class="sys-status">
+        <span class="sys-dot"></span>
+        <span>Système Opérationnel</span>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span class="meta-label">Gestion des Alarmes</span>
+    </div>
+  </header>
+
+  <!-- ═══════════ CONTENT ═══════════ -->
+  <main class="page-content">
+
+    <!-- Heading -->
+    <div class="page-heading">
+      <div>
+        <h2 class="page-title">
+          <svg class="page-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Journal des Alarmes
+        </h2>
+        <p class="page-subtitle">Toutes les alarmes triées par date de déclenchement (plus récentes en premier)</p>
+      </div>
+      <button class="btn btn-alarm" id="btn-add-alarm" (click)="openAdd()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nouvelle Alarme
+      </button>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-row">
+      <div class="kpi-card glass">
+        <div class="kpi-icon kpi-total">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div>
+          <div class="kpi-val">{{ alarms.length }}</div>
+          <div class="kpi-label">Total Alarmes</div>
+        </div>
+      </div>
+      <div class="kpi-card glass kpi-new-card">
+        <div class="kpi-icon kpi-new">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div>
+          <div class="kpi-val kpi-val-new">{{ newCount }}</div>
+          <div class="kpi-label">Non Acquittées</div>
+        </div>
+        <div class="kpi-pulse-alarm" *ngIf="newCount > 0"></div>
+      </div>
+      <div class="kpi-card glass">
+        <div class="kpi-icon kpi-critical">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 22 21 2 21"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <div class="kpi-val kpi-val-critical">{{ criticalCount }}</div>
+          <div class="kpi-label">Critiques</div>
+        </div>
+      </div>
+      <div class="kpi-card glass">
+        <div class="kpi-icon kpi-active">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <div class="kpi-val">{{ activeCount }}</div>
+          <div class="kpi-label">Actives</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar glass">
+      <div class="search-box">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input
+          id="search-alarms"
+          class="search-input"
+          type="text"
+          placeholder="Rechercher par code, message, priorité..."
+          (input)="onSearch($event)"
+        />
+      </div>
+
+      <div class="filter-group">
+        <!-- Machine Filter -->
+        <div class="filter-box">
+          <label class="filter-label">Machine</label>
+          <select class="filter-select" [(ngModel)]="selectedMachineId" (ngModelChange)="onFilterChange()">
+            <option [ngValue]="null">Toutes les Machines</option>
+            <option *ngFor="let m of machines" [ngValue]="m.id">{{ m.name }}</option>
+          </select>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="filter-box">
+          <label class="filter-label">Statut</label>
+          <select class="filter-select" [(ngModel)]="filterStatus" (ngModelChange)="onFilterChange()">
+            <option value="all">Toutes les Alarmes</option>
+            <option value="active">Alarmes Actives</option>
+            <option value="inactive">Alarmes Inactives</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar-info">
+        <span class="record-count">{{ filteredAlarms.length }} / {{ alarms.length }} enregistrement(s)</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap glass" *ngIf="!isLoading; else loadingTpl">
+      <table class="alarm-table" *ngIf="filteredAlarms.length > 0; else emptyTpl">
+        <thead>
+          <tr>
+            <th>Priorité</th>
+            <th>Code</th>
+            <th>Message</th>
+            <th>Statut</th>
+            <th>Machine</th>
+            <th>Déclenchée il y a</th>
+            <th>Date Déclenchement</th>
+            <th>Active</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            class="table-row"
+            *ngFor="let alarm of filteredAlarms"
+            [class.row-critical]="alarm.priority === AlarmPriority.CRITICAL && alarm.isActive"
+          >
+
+            <!-- Priority -->
+            <td>
+              <div class="priority-cell">
+                <span class="priority-dot"
+                  [class.dot-critical]="alarm.priority === AlarmPriority.CRITICAL"
+                  [class.dot-medium]="alarm.priority === AlarmPriority.MEDIUM"
+                  [class.dot-low]="alarm.priority === AlarmPriority.LOW">
+                </span>
+                <span class="priority-badge"
+                  [class.badge-critical]="alarm.priority === AlarmPriority.CRITICAL"
+                  [class.badge-medium]="alarm.priority === AlarmPriority.MEDIUM"
+                  [class.badge-low]="alarm.priority === AlarmPriority.LOW">
+                  {{ alarm.priority }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Code -->
+            <td><span class="code-badge">{{ alarm.code }}</span></td>
+
+            <!-- Message -->
+            <td>
+              <span class="alarm-message" [title]="alarm.message || ''">
+                {{ alarm.message || '—' }}
+              </span>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <span class="status-chip"
+                [class.chip-new]="alarm.status === AlarmStatus.NEW"
+                [class.chip-viewed]="alarm.status === AlarmStatus.VIEWED"
+                [class.chip-reset]="alarm.status === AlarmStatus.RESET">
+                <span class="chip-dot"></span>
+                {{ alarm.status }}
+              </span>
+            </td>
+
+            <!-- Machine -->
+            <td>
+              <div class="machine-cell" *ngIf="getMachineName(alarm) !== '—'; else noMachine">
+                <span class="machine-code-sm">{{ getMachineCode(alarm) }}</span>
+                <span class="machine-name-sm">{{ getMachineName(alarm) }}</span>
+              </div>
+              <ng-template #noMachine><span class="muted">—</span></ng-template>
+            </td>
+
+            <!-- Time since -->
+            <td>
+              <span class="time-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                {{ timeSince(alarm.triggeredAt) }}
+              </span>
+            </td>
+
+            <!-- TriggeredAt -->
+            <td><span class="date-text">{{ alarm.triggeredAt | date:'dd/MM/yyyy HH:mm' }}</span></td>
+
+            <!-- isActive -->
+            <td>
+              <span class="active-chip" [class.chip-active]="alarm.isActive" [class.chip-inactive]="!alarm.isActive">
+                {{ alarm.isActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <div class="actions-cell">
+                <button class="icon-btn btn-edit" (click)="openEdit(alarm)" title="Modifier">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="icon-btn btn-delete" (click)="deleteAlarm(alarm.id)" title="Supprimer">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6m4-6v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyTpl>
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <p>Aucune alarme trouvée</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <ng-template #loadingTpl>
+      <div class="loading-state glass">
+        <div class="spinner"></div>
+        <p>Chargement des alarmes...</p>
+      </div>
+    </ng-template>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<app-popup-add-new-alarme
+  *ngIf="showAdd"
+  (close)="closePops()"
+  (save)="onAlarmAdded($event)">
+</app-popup-add-new-alarme>
+
+<app-edit-alarmes
+  *ngIf="showEdit && selectedAlarm"
+  [alarm]="selectedAlarm"
+  (close)="closePops()"
+  (save)="onAlarmUpdated($event)">
+</app-edit-alarmes>

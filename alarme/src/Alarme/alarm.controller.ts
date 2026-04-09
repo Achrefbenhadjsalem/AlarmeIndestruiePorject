@@ -29,6 +29,20 @@ export class AlarmController {
     return this.service.create(dto, machineId);
   }
 
+  @Get('active')
+  @ApiOperation({ summary: 'List active alarms' })
+  @ApiResponse({ status: 200, description: 'List of all active alarms' })
+  findActive() {
+    return this.service.findActive();
+  }
+
+  @Get('inactive')
+  @ApiOperation({ summary: 'List inactive alarms' })
+  @ApiResponse({ status: 200, description: 'List of all inactive alarms' })
+  findInactive() {
+    return this.service.findInactive();
+  }
+
   @Get()
   @ApiOperation({ summary: 'List alarms' })
   findAll() {
@@ -46,6 +60,19 @@ export class AlarmController {
   @ApiOperation({ summary: 'Get an alarm by id' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
+  }
+  @Get('machine/:machineId/active')
+  @ApiOperation({ summary: "List active alarms for a specific machine" })
+  @ApiResponse({ status: 200, description: 'List of active alarms for the machine' })
+  findActiveByMachine(@Param('machineId', ParseIntPipe) machineId: number) {
+    return this.service.findActiveByMachine(machineId);
+  }
+
+  @Get('machine/:machineId/inactive')
+  @ApiOperation({ summary: "List inactive alarms for a specific machine" })
+  @ApiResponse({ status: 200, description: 'List of inactive alarms for the machine' })
+  findInactiveByMachine(@Param('machineId', ParseIntPipe) machineId: number) {
+    return this.service.findInactiveByMachine(machineId);
   }
 
   @Patch(':id')
