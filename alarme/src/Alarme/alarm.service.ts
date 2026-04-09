@@ -5,6 +5,7 @@ import { Alarm } from './Alarme';
 import { Machine } from 'src/Machine/Machine';
 import { CreateAlarmDto } from './dto/create-alarm.dto';
 import { UpdateAlarmDto } from './dto/update-alarm.dto';
+import { AlarmGateway } from './alarm.gateway';
 
 @Injectable()
 export class AlarmService {
@@ -13,6 +14,7 @@ export class AlarmService {
     private readonly alarmRepo: Repository<Alarm>,
     @InjectRepository(Machine)
     private readonly machineRepo: Repository<Machine>,
+    private readonly gateway: AlarmGateway,
   ) {}
 
   async create(dto: CreateAlarmDto, machineId: number) {
@@ -29,7 +31,13 @@ export class AlarmService {
       machine,
     } as any);
 
-    return this.alarmRepo.save(alarm);
+    const saved = await this.alarmRepo.save(alarm);
+    try {
+      if (this.gateway && this.gateway.server) {
+        this.gateway.server.emit('alarmCreated', saved);
+      }
+    } catch (e) {}
+    return saved;
   }
 
   findAll() {

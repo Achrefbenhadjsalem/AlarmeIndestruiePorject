@@ -8,7 +8,15 @@
   flex-direction: column;
   background: var(--bg-base);
 }
+.row-active {
+  background: rgba(220, 38, 38, 0.06); /* Fond rouge très léger */
+  border-left: 3px solid var(--status-alarm, #dc2626); /* Bordure rouge à gauche */
+}
 
+/* Optionnel : Assure-toi que le survol garde la teinte rouge */
+.table-row.row-active:hover {
+  background: rgba(220, 38, 38, 0.12);
+}
 /* ── Topbar ── */
 .topbar {
   display: flex;

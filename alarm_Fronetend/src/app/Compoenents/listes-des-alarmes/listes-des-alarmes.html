@@ -137,10 +137,10 @@
         </thead>
         <tbody>
           <tr
-            class="table-row"
-            *ngFor="let alarm of filteredAlarms"
-            [class.row-critical]="alarm.priority === AlarmPriority.CRITICAL && alarm.isActive"
-          >
+  class="table-row"
+  *ngFor="let alarm of filteredAlarms"
+  [class.row-active]="alarm.isActive"
+>
 
             <!-- Priority -->
             <td>

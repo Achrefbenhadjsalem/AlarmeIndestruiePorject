@@ -1,11 +1,12 @@
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationStart, NavigationEnd, NavigationError, NavigationCancel } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { PopupAlarmeDetected } from './Compoenents/popup-alarme-detected/popup-alarme-detected';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, PopupAlarmeDetected],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
