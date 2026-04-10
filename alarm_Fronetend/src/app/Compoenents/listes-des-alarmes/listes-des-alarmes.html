@@ -33,10 +33,7 @@
         </h2>
         <p class="page-subtitle">Toutes les alarmes triées par date de déclenchement (plus récentes en premier)</p>
       </div>
-      <button class="btn btn-alarm" id="btn-add-alarm" (click)="openAdd()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nouvelle Alarme
-      </button>
+      
     </div>
 
     <!-- KPI Cards -->
@@ -60,15 +57,7 @@
         </div>
         <div class="kpi-pulse-alarm" *ngIf="newCount > 0"></div>
       </div>
-      <div class="kpi-card glass">
-        <div class="kpi-icon kpi-critical">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 22 21 2 21"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        </div>
-        <div>
-          <div class="kpi-val kpi-val-critical">{{ criticalCount }}</div>
-          <div class="kpi-label">Critiques</div>
-        </div>
-      </div>
+     
       <div class="kpi-card glass">
         <div class="kpi-icon kpi-active">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
